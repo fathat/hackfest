@@ -95,7 +95,20 @@ header h1 {
   padding:20px;
   -webkit-border-radius:10px;
   -moz-border-radius:10px;
-  display:none; }
+  display:none;
+}
+  
+#message_display {
+  position:absolute;
+  background-color:#111;
+  color: #EEE;
+  border:1px solid #999;
+  padding:20px;
+  -webkit-border-radius:10px;
+  -moz-border-radius:10px;
+  display:none;
+  opacity: 0.8;  
+}
 
 label,input,textarea {
   float:left; clear:both;
