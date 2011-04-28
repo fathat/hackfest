@@ -14,7 +14,7 @@
  * @module HACKFEST
  */
 
-function getParameterByName( name ) {
+/*function getParameterByName( name ) {
   name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
   var regexS = "[\\?&]"+name+"=([^&#]*)";
   var regex = new RegExp( regexS );
@@ -23,6 +23,32 @@ function getParameterByName( name ) {
     return "";
   else
     return decodeURIComponent(results[1].replace(/\+/g, " "));
+}*/
+
+//A bunch of globals! YEAH!
+ticker = 0;
+var skho = $('#hipster_octopus');
+var skzw = $('#zombie_whale');
+var sksf = $('#star_starfish');
+var skbs = $('#big_squid');
+function clock() {
+  var hoskew = Math.sin(ticker) * 25;
+  var zwskew = Math.sin(ticker+1) * 25;
+  var sfskew = Math.sin(ticker+2) * 25;
+  var bsskew = Math.sin(ticker*0.5) * 25;
+  skho.css('-moz-transform', 'skew(' + hoskew + 'deg)');
+  skho.css('-webkit-transform', 'skew(' + hoskew + 'deg)');
+  
+  skzw.css('-moz-transform', 'skew(' + zwskew + 'deg)');
+  skzw.css('-webkit-transform', 'skew(' + zwskew + 'deg)');
+  
+  sksf.css('-moz-transform', 'skew(' + sfskew + 'deg)');
+  sksf.css('-webkit-transform', 'skew(' + sfskew + 'deg)');
+  
+  skbs.css('-moz-transform', 'skew(' + bsskew + 'deg)');
+  skbs.css('-webkit-transform', 'skew(' + bsskew + 'deg)');
+  
+  ticker += .033;
 }
 
 
@@ -32,14 +58,18 @@ function getParameterByName( name ) {
   var HACKFEST = {
 
     init: function () {
-      var target = "#" + getParameterByName('to');
-      var message = getParameterByName('message');
+      //var target = "#" + getParameterByName('to');
+      //var message = getParameterByName('message');
       
-      if(target == "#") {
-        target = "#hipster_octopus";
-      }
+      //if(target == "#") {
+      //  target = "#hipster_octopus";
+      //}
+      
+      var interval=self.setInterval("clock()",33);
 
       var zw = $('#zombie_whale');
+      var hoPosition = $('#hipster_octopus').position();
+      hoPosition.left += 100;
       
       function makeWhaleClassy() {
         zw.css('background-position', '0 -380px' );  
@@ -50,12 +80,13 @@ function getParameterByName( name ) {
       }
       
       function makeWhaleAngry() {
-        zw.css('background-position', '0 -490px' );  
+        zw.css('background-position', '0 -590px' );  
       }
       
       makeWhaleClassy();
       
       var showForm = function() {
+        makeWhaleAngry();
         $('#message_form').show()
       }
       
@@ -63,17 +94,12 @@ function getParameterByName( name ) {
         $(sc).animate($(dest).position(), 2000, whenThere)
       };
       
-      if(target == '#hipster_octopus') {
-        moveScTo('#zombie_whale', '#hipster_octopus', showForm)
-      }
-      else {
-        moveScTo('#zombie_whale', target,
-                 function() {
-                   $('#message_text').text(message);
-                   $('#message_display').position($(target).position());
-                   $('#message_display').show('slow');
-                 })
-      }
+      var moveScToP = function(sc, dest, whenThere) {
+        $(sc).animate(dest, 2000, whenThere)
+      };
+      
+      moveScToP('#zombie_whale', hoPosition, showForm)
+      
       
       function showMessageAt(msg, p) {
           $('#message_text').text(msg);
@@ -91,6 +117,7 @@ function getParameterByName( name ) {
           var sendTo = $('#to').val();
           console.log($('#to').val());
           var targetPosition = $(mytarget).position();
+          targetPosition.top = targetPosition.top - 50;
 
           showMessageAt('#hipster_octopus says: ' + $('#message').val(), targetPosition)
 
@@ -99,17 +126,34 @@ function getParameterByName( name ) {
         }
         
         function responseToHipster() {
-          return 'THAT IS SO LAST WEEK HIPSTER OCTOPUS';
+          var msgs = ['THAT IS SO LAST WEEK HIPSTER OCTOPUS',
+                      'YOU SUCK HIPSTER OCTOPUS',
+                      'NOT COOL HIPSTER OCTOPUS']
+          var randomIndex = Math.floor(Math.random() * msgs.length)
+          return msgs[randomIndex];
         }
         
         window.hateOnHO = function() {
           $('#message_display').hide('slow');
-          moveScTo('#zombie_whale', target, function() {  
-            showMessageAt('#' + $('#to').val() + ' says: ' + responseToHipster() , $('#hipster_octopus').position())
+          makeWhaleAngry();
+          
+          moveScToP('#zombie_whale', hoPosition, function() {
+            var hoTop = $('#hipster_octopus').position();
+            hoTop.top -= 50;
+            showMessageAt('#' + $('#to').val() + ' says: ' + responseToHipster() , hoTop)
+            t=setTimeout("allowHipsterRetort()",3000);
           });
         }
         
-        moveScTo('#zombie_whale', mytarget, deliverMessage);
+        window.allowHipsterRetort = function() {
+          $('#message_display').hide('fast');
+          $('#message_form').show('fast');
+        }
+        
+        
+        var moveTo = $(mytarget).position();
+        moveTo.left -= 200;
+        moveScToP('#zombie_whale', moveTo, deliverMessage);
         
         $('#message_display').hide('fast');
         $('#message_form').hide('fast');
